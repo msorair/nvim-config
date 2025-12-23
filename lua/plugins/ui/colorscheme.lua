@@ -1,8 +1,17 @@
 return {
   {
-    "folke/tokyonight.nvim",
+    "navarasu/onedark.nvim",
     priority = 1000,
-    opts = {},
+    config = function()
+      require('onedark').setup {
+        style = 'light',
+        colors = {
+          yellow = '#ffb662',
+          bg0 = '#F7F7F7'
+        },
+      }
+      require('onedark').load()
+    end
   },
   {
     "mvllow/modes.nvim",

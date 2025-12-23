@@ -8,7 +8,7 @@ require("lazy.core.handler.event").mappings.LazyFile = {
 }
 
 require("lazy").setup {
-  install = { colorscheme = { "tokyonight", "habamax" } },
+  install = { colorscheme = { "tokyonight", "onedark", "habamax" } },
   checker = { enabled = true, frequence = 24 * 60 * 60 },
   change_detection = { enabled = false },
   rocks = { enabled = false },
@@ -47,4 +47,4 @@ require("lazy").setup {
   },
 }
 
-vim.cmd.colorscheme "tokyonight"
+vim.cmd.colorscheme "onedark"

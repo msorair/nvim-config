@@ -1,4 +1,6 @@
-local function is_mathblock() return require("nvim-treesitter.ts_utils").get_node_at_cursor():type() == "latex_block" end
+local function is_mathblock()
+  return require("nvim-treesitter.ts_utils").get_node_at_cursor():type() == "latex_block"
+end
 local function auto_trig(trig)
   return { trig = trig, snippetType = "autosnippet", wordTrig = false, hidden = true, condition = is_mathblock }
 end
@@ -26,20 +28,36 @@ local function vim_pattern(trig)
 end
 
 local function capture(n)
-  return f(function(_, snip) return snip.captures[n] end)
+  return f(function(_, snip)
+    return snip.captures[n]
+  end)
 end
 
-local function latex_(trig, node) return s(auto_trig(trig), node) end
+local function latex_(trig, node)
+  return s(auto_trig(trig), node)
+end
 
 --- just Text
-local function latext(trig, ...) return s(auto_trig(trig), t(...)) end
+local function latext(trig, ...)
+  return s(auto_trig(trig), t(...))
+end
 
 --- Pattern
-local function latexp(pattern, node) return s(auto_pattern(pattern), node) end
+local function latexp(pattern, node)
+  return s(auto_pattern(pattern), node)
+end
 
 --- Capture
 local function latexc(pattern, replace, ...)
-  return latexp(pattern, fmta(replace, vim.tbl_map(function(index) return capture(index) end, { ... })))
+  return latexp(
+    pattern,
+    fmta(
+      replace,
+      vim.tbl_map(function(index)
+        return capture(index)
+      end, { ... })
+    )
+  )
 end
 
 --- Insert points
@@ -48,14 +66,20 @@ local function latexi(trig, replace, ...)
     trig,
     fmta(
       replace,
-      vim.tbl_map(function(index) return type(index) == "number" and i(index) or i(unpack(index)) end, { ... })
+      vim.tbl_map(function(index)
+        return type(index) == "number" and i(index) or i(unpack(index))
+      end, { ... })
     )
   )
 end
 
 --- add Slash
-local function latexs(trig, replace) return s(auto_trig(trig), t("\\" .. (replace or trig))) end
-local function latexS(trig) return s(vim_pattern([[\v\\@<!]] .. trig), t("\\" .. trig)) end
+local function latexs(trig, replace)
+  return s(auto_trig(trig), t("\\" .. (replace or trig)))
+end
+local function latexS(trig)
+  return s(vim_pattern([[\v\\@<!]] .. trig), t("\\" .. trig))
+end
 
 --- Begin end
 local function latexb(trig, replace)
@@ -79,7 +103,7 @@ local function latexl(lr)
 end
 
 return {
-  s({ trig = "mk", desc = "Inline Math Block" }, { t "$ ", i(1), t " $" }),
+  s({ trig = "mk", desc = "Inline Math Block" }, { t("$ "), i(1), t(" $") }),
   s(
     { trig = "dm", desc = "Math Block" },
     fmta(
@@ -90,6 +114,17 @@ return {
     ]],
       { i(1) }
     )
+  ),
+  latexi(
+    "equaa",
+    [[
+      \begin{equation}
+      \begin{aligned}
+      <>
+      \end{aligned}
+      \end{equation}
+      ]],
+    1
   ),
 
   latext("  ", "\\;"),
@@ -138,8 +173,8 @@ return {
   latexs("@z", "zeta"),
   latexi("@@", "\\boldsymbol{ @<> }", 1),
 
-  latexs "tau",
-  latexs "Tau",
+  latexs("tau"),
+  latexs("Tau"),
 
   latexi('"', [[\text{<>}]], { 1, "hello world" }),
 
@@ -163,8 +198,12 @@ return {
   latexs "log",
   latexs "ln",
 
-  -- Linear algebra
-  latexS "det",
+  latexi("mrm", "\\mathrm{<>}", 1),
+  latexi("mbf", "\\mathbf{<>}", 1),
+  latexi("mbb", "\\mathbb{<>}", 1),
+  latexi("mit", "\\mathit{<>}", 1),
+  latexi("mcal", "\\mathcal{<>}", 1),
+  latexi("gbs", "\\boldsymbol{<>}", 1),
 
   latexi("ddot", "\\ddot{<>}", 1),
   latexs("cdot", "cdot"),
@@ -194,10 +233,18 @@ return {
   latext("yii", "y_{i}"),
   latext("yjj", "y_{j}"),
 
+  latext("xnn", "x_{n}"),
+  latext("xii", "x_{i}"),
+  latext("xjj", "x_{j}"),
+  latext("xp1", "x_{n+1}"),
+  latext("ynn", "y_{n}"),
+  latext("yii", "y_{i}"),
+  latext("yjj", "y_{j}"),
+
   -- Symbols
   latexs("ooo", "infty"),
-  latexS "sum",
-  latexS "prod",
+  latexS("sum"),
+  latexS("prod"),
   latexi("\\sum", "\\sum_{<>=<>}^{<>}", 1, 2, 3),
   latexi("\\prod", "\\prod{<>=<>}^{<>}", 1, 2, 3),
   latexi("lim", "\\lim_{<> \\to <>}", 1, 2),
@@ -234,13 +281,6 @@ return {
   latexi("set", "\\{ <> \\}", 1),
   latexs("exis", "exists"),
 
-  latexs("LL", "mathcal{L}"),
-  latexs("HH", "mathcal{H}"),
-  latexs("CC", "mathcal{C}"),
-  latexs("RR", "mathcal{R}"),
-  latexs("ZZ", "mathcal{Z}"),
-  latexs("NN", "mathcal{N}"),
-
   latexi("prt", "\\frac{\\partial <>}{\\partial <>}", { 1, "x" }, { 2, "y" }),
   latexc("pr(%a)(%a)", "\\frac{\\partial <>}{\\partial <>}", 1, 2),
   latexi("ddx", "\\frac{\\mathrm d<>}{\\mathrm dx}", 1),
@@ -256,20 +296,35 @@ return {
   latext("oinf", "\\int_{0}^{\\infty}"),
   latexi("iinf", "\\int_{0}^{\\infty} <> \\, \\mathrm d<>", 1, { 2, "x" }),
 
-  latexS "sinh",
-  latexS "cosh",
-  latexS "tanh",
-  latexS "coth",
+  latexi("prt", "\\frac{\\partial <>}{\\partial <>}", { 1, "x" }, { 2, "y" }),
+  latexc("pr(%a)(%a)", "\\frac{\\partial <>}{\\partial <>}", 1, 2),
+  latexi("ddx", "\\frac{\\mathrm d<>}{\\mathrm dx}", 1),
+  latexi("ddy", "\\frac{\\mathrm d<>}{\\mathrm dy}", 1),
+  latexi("ddz", "\\frac{\\mathrm d<>}{\\mathrm dz}", 1),
+  latexc("md(%a)", "\\mathrm d<>", 1),
+  latexi("\\int", "\\int <> \\, \\mathrm d<>", 1, { 2, "x" }),
+  latexi("dint", "\\int^{<>}_{<>} <> \\, \\mathrm d<>", { 1, "1" }, { 2, "0" }, 3, { 4, "x" }),
+  latexS("int"),
+  latexS("oint"),
+  latexi("iint", "\\iint\\limits_{<>}", { 1, "D" }),
+  latexi("iiint", "\\iiint\\limits_{<>}", { 1, "D" }),
+  latext("oinf", "\\int_{0}^{\\infty}"),
+  latexi("iinf", "\\int_{0}^{\\infty} <> \\, \\mathrm d<>", 1, { 2, "x" }),
 
-  latexS "arcsin",
-  latexS "sin",
-  latexS "arccos",
-  latexS "cos",
-  latexS "arctan",
-  latexS "tan",
-  latexS "csc",
-  latexS "sec",
-  latexS "cot",
+  latexS("sinh"),
+  latexS("cosh"),
+  latexS("tanh"),
+  latexS("coth"),
+
+  latexS("arcsin"),
+  latexS("sin"),
+  latexS("arccos"),
+  latexS("cos"),
+  latexS("arctan"),
+  latexS("tan"),
+  latexS("csc"),
+  latexS("sec"),
+  latexS("cot"),
 
   latexc("\\arcsin([A-Za-gi-z])", "\\arcsin <>", 1),
   latexc("\\sin([A-Za-gi-z])", "\\sin <>", 1),
@@ -286,11 +341,10 @@ return {
   latexb("Bmat", "Bmatrix"),
   latexb("vmat", "vmatrix"),
   latexb("Vmat", "Vmatrix"),
-  latexb "matrix",
-  latexb "cases",
+  latexb("matrix"),
+  latexb("cases"),
   latexb("dcases", "dcases"),
-  latexb "align",
-  latexb "array",
+  latexb("align"),
 
   latexi("avg", "\\langle <> \\rangle", 1),
   latexi("norm", "\\lvert <> \\rvert", 1),
@@ -299,9 +353,9 @@ return {
   latexi("floor", "\\lfloor <> \\rfloor", 1),
   latexi("mod", "|<>|", 1),
 
-  latexl "()",
-  latexl "{}",
-  latexl "[]",
-  latexl "||",
+  latexl("()"),
+  latexl("{}"),
+  latexl("[]"),
+  latexl("||"),
   latex_("lra", fmt("\\left< {} \\right>", { i(1) })),
 }
