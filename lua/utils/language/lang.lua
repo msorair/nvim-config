@@ -53,6 +53,22 @@ local metatable = {
       })
     end,
 
+    config_dap = function(self)
+      local dap_mod = self.dap
+      if not dap_mod then return end
+      local dap = require "dap"
+      if dap_mod.adapters then
+        for name, adapter in pairs(dap_mod.adapters) do
+          dap.adapters[name] = adapter
+        end
+      end
+      if dap_mod.configurations then
+        for ft, configs in pairs(dap_mod.configurations) do
+          dap.configurations[ft] = vim.list_extend(dap.configurations[ft] or {}, configs)
+        end
+      end
+    end,
+
     get_lspnames = function(self)
       local lsp = self.lsp
       if type(self.lsp) == "string" then
@@ -83,6 +99,7 @@ function Lang.new(name, config)
   result:set_treesitter(config.treesitter)
   result:set_formatter(config.formatter)
   result.lsp = config.lsp
+  result.dap = config.dap
   result.plugins = config.plugins
   result.pkgs = config.pkgs
   result.options = config.options

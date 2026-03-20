@@ -33,7 +33,7 @@ local function config_langs(langs, opts)
   for _, lang in pairs(langs.get) do
     config_options(lang, opts)
   end
-  langs:config { "lsp", "mason", "treesitter", "formatter" }
+  langs:config { "lsp", "mason", "treesitter", "formatter", "dap" }
 end
 
 return {

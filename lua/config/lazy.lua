@@ -18,6 +18,7 @@ require("lazy").setup {
     { import = "plugins.lsp" },
     { import = "plugins.util" },
     { import = "plugins.editor" },
+    { import = "plugins.extra" },
 
     require("config.language").plugins,
   },

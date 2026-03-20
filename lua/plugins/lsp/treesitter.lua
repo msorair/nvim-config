@@ -1,7 +1,8 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    version = false, -- last release is way too old and doesn't work on Windows
+    commit = "42fc28ba918343ebfd5565147a42a26580579482",
+    pin = true,
     build = ":TSUpdate",
     init = function(plugin)
       require("lazy.core.loader").add_to_rtp(plugin)
@@ -16,6 +17,8 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
+    commit = "5ca4aaa6efdcc59be46b95a3e876300cfead05ef",
+    pin = true,
     event = { "LazyFile", "BufAdd" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     config = function()
@@ -27,39 +30,21 @@ return {
         incremental_selection = {
           enable = true,
           keymaps = {
-            init_selection = "<C-space>",
-            node_incremental = "<C-space>",
-            scope_incremental = false,
+            init_selection = "<CR>",
+            node_incremental = "<CR>",
+            scope_incremental = "<TAB>",
             node_decremental = "<bs>",
           },
         },
         ensure_installed = require("config.language").treesitter,
         textobjects = {
-          lsp_interop = {
-            enable = true,
-            border = "none",
-            floating_preview_opts = {},
-            peek_definition_code = {
-              ["<leader>K"] = "@function.outer",
-            },
-          },
           swap = {
             enable = true,
-            swap_previous = {
-              ["<aa"] = "@parameter.inner",
-              ["<ia"] = "@parameter.inner",
-              ["<af"] = "@function.outer",
-              ["<if"] = "@function.inner",
-              ["<ac"] = "@class.outer",
-              ["<ic"] = "@class.outer",
-            },
             swap_next = {
-              [">aa"] = "@parameter.inner",
-              [">ia"] = "@parameter.inner",
-              [">af"] = "@function.outer",
-              [">if"] = "@function.outer",
-              [">ac"] = "@class.outer",
-              [">ic"] = "@class.outer",
+              [">a"] = "@parameter.inner",
+            },
+            swap_previous = {
+              ["<a"] = "@parameter.inner",
             },
           },
           select = {
